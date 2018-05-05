@@ -1,12 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchPost } from '../actions';
+import { fetchPost, deletePost } from '../actions';
+import { Link } from 'react-router-dom';
 
 class PostsShow extends Component {
   componentDidMount() {
+    // grabbing the post id from reactrouter match object and in params which lists all wildcards in the url
     const { id } = this.props.match.params;
     
     this.props.fetchPost(id);
+  }
+
+  handleDelete() {
+    const { id } = this.props.match.params;
+    
+    this.props.deletePost(id, () => {
+      this.props.history.push('/')
+    });
   }
 
   render() {
@@ -17,6 +27,11 @@ class PostsShow extends Component {
 
     return (
       <div>
+        <Link to="/" >Back to Index</Link>
+        <button 
+          onClick={this.handleDelete.bind(this)} className="btn btn-danger pull-xs-right">
+            Delete
+          </button>
         <h3>{post.title}</h3>
         <h6>{post.categories}</h6>
         <p>{post.content}</p>
@@ -25,9 +40,9 @@ class PostsShow extends Component {
   }
 }
 
-// ownProps is available props sent to this component
+// ownProps is all available props headed to this component
 function mapStateToProps({ posts }, ownProps) {
   return { post: posts[ownProps.match.params.id] };
 }
 
-export default connect(mapStateToProps, { fetchPost })(PostsShow);
+export default connect(mapStateToProps, { fetchPost, deletePost })(PostsShow);

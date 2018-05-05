@@ -7,8 +7,8 @@ import { createPost } from '../actions';
 class PostsNew extends Component {
   // need to bring in field obj for reduxForm to work
   renderField(field) {
-    const { meta: { touched, error } } = field;
-    const className = `form-group ${touched && error ? 'has-danger' : ''}`
+    // const { meta: { touched, error } } = field;
+    const className = `form-group ${field.meta.touched && field.meta.error ? 'has-danger' : ''}`
     return (
       <div className={className}>
         <label>{field.label}</label>
@@ -18,13 +18,13 @@ class PostsNew extends Component {
           {...field.input}
         />
         <div className="text-help">
-          {touched ? error : ''}
+          {field.meta.touched ? field.meta.error : ''}
         </div>
       </div>
     );
   }
 
-  onSubmit(values) {
+  onSubmitHandler(values) {
     this.props.createPost(values, () => {
       this.props.history.push('/');
     });
@@ -35,7 +35,7 @@ class PostsNew extends Component {
 
     return (
       <div>
-        <form onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+        <form onSubmit={handleSubmit(this.onSubmitHandler.bind(this))}>
           <Field
             label="Title"
             name="title"
@@ -51,8 +51,12 @@ class PostsNew extends Component {
             name="content" 
             component={this.renderField}
           />
-          <button type="submit" className="btn btn-primary">Submit</button>
-          <Link to='/' className="btn btn-danger">Cancel</Link>
+          <button type="submit" className="btn  btn-primary">
+            Submit
+          </button>
+          <Link to='/' className="btn btn-danger">
+            Cancel
+          </Link>
         </form>
       </div>
     );
@@ -62,8 +66,8 @@ class PostsNew extends Component {
 /* validate called automagically by reduxForm */
 function validate(values) {
   const errors = {};
-
-  // validate inputs from 'values'
+ 
+  // If no values on title, add error on error obj
   if (!values.title) {
     errors.title = "Enter a title";
   }
@@ -73,8 +77,8 @@ function validate(values) {
   if (!values.content) {
     errors.content = "Enter content";
   }
-  // If errors is empty, form is fine to submit
-  // If errors has any properties redux form assums form is invalid
+  // If errors obj is empty, reduxForm knows its fine to submit
+  // If errors obj has any properties redux form assumes form is invalid
   return errors;
 }
 
